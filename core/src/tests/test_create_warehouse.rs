@@ -1,37 +1,21 @@
-use async_trait::async_trait;
-
 use super::super::{
-  entity::Warehouse, repository::WarehouseRepository,
-  use_case::create_warehouse::CreateWarehouse,
+  entity::Warehouse, use_case::create_warehouse::CreateWarehouse,
 };
-
-struct Repository {
-  pub data: Vec<Warehouse>,
-}
-
-#[async_trait]
-impl WarehouseRepository for Repository {
-  async fn create(&mut self, name: String) -> Result<Warehouse, &'static str> {
-    let new_warehouse = Warehouse { name };
-
-    self.data.push(new_warehouse.clone());
-
-    Ok(new_warehouse)
-  }
-  async fn get(&self, name: String) -> Option<Warehouse> {
-    Some(Warehouse { name })
-  }
-}
+use super::mock::MockWarehouseRepository;
 
 #[tokio::test]
 async fn test_create_warehouse() {
-  let repository = Repository { data: vec![] };
-  let mut use_case = CreateWarehouse::new(repository);
+  let warehouse_repo = MockWarehouseRepository {};
+  let mut use_case = CreateWarehouse::new(warehouse_repo);
 
   let warehouse = Warehouse {
+    id: String::from("1"),
     name: String::from("test_warehouse"),
+    assets: Some(vec![]),
+    tools: Some(vec![]),
   };
+
   let new_warehouse = use_case.execute(warehouse.name.clone()).await.unwrap();
 
-  assert_eq!(new_warehouse.name, warehouse.name);
+  assert_eq!(new_warehouse, warehouse);
 }
