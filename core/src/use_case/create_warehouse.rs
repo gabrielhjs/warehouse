@@ -1,26 +1,38 @@
+use async_trait::async_trait;
+
 use super::super::{entity::Warehouse, repository::WarehouseRepository};
+use super::base::UseCase;
+
+pub struct Input {
+  pub name: String,
+}
 
 pub struct CreateWarehouse<W> {
   warehouse_repo: W,
 }
 
-impl<W> CreateWarehouse<W> {
-  pub fn new(warehouse_repo: W) -> Self
-  where
-    W: WarehouseRepository,
-  {
+impl<W: WarehouseRepository> CreateWarehouse<W> {
+  pub fn new(warehouse_repo: W) -> Self {
     CreateWarehouse { warehouse_repo }
   }
-  pub async fn execute(
-    &mut self,
-    name: String,
-  ) -> Result<Warehouse, &'static str>
-  where
-    W: WarehouseRepository,
-  {
+}
+
+#[async_trait(?Send)]
+impl<W: WarehouseRepository> UseCase for CreateWarehouse<W> {
+  type Input = Input;
+  type Output = Warehouse;
+
+  fn name(&self) -> &'static str {
+    "Create Warehouse"
+  }
+
+  async fn run(
+    &self,
+    params: &Self::Input,
+  ) -> Result<Self::Output, &'static str> {
     let new_warehouse = Warehouse {
       id: String::from("1"),
-      name,
+      name: params.name.clone(),
       assets: Some(vec![]),
       tools: Some(vec![]),
     };

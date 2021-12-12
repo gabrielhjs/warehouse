@@ -1,0 +1,4 @@
+CREATE TABLE warehouse (
+	id uuid PRIMARY KEY,
+	name VARCHAR UNIQUE NOT NULL
+)

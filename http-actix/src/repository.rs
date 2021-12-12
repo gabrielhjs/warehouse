@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use super::super::{entity::*, repository::*};
+use warehouse_core::{entity::*, repository::*};
 
 pub struct MockWarehouseRepository;
 
